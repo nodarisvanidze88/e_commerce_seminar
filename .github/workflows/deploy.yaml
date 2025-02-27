@@ -26,7 +26,11 @@ jobs:
                   cd /app
                   sudo apt update
                   sudo apt install -y python3-venv python3-pip gunicorn
-                  git clone https://github.com/nodarisvanidze88/e_commerce_seminar.git .
+                  if [ ! -d ".git" ]; then
+                      git clone https://github.com/nodarisvanidze88/e_commerce_seminar.git .
+                  else
+                      git pull
+                  fi
                   python3 -m venv venv
                   source venv/bin/activate
                   pip install -r requirements.txt
