@@ -17,9 +17,47 @@ jobs:
               uses: webfactory/ssh-agent@v0.5.3
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
-            - name: Create Infrastructure
+            - name: Create Infrastructure 1
               run: |
                   ssh -o StrictHostKeyChecking=no root@207.154.242.51 <<EOF
+                  if [ ! -d "/app" ]; then
+                      mkdir -p /app
+                  fi
+                  cd /app
+                  sudo apt update
+                  sudo apt install -y python3-venv python3-pip gunicorn
+                  if [ ! -d ".git" ]; then
+                      git clone https://github.com/nodarisvanidze88/e_commerce_seminar.git .
+                  else
+                      git pull
+                  fi
+                  python3 -m venv venv
+                  source venv/bin/activate
+                  pip install -r requirements.txt
+                  cat <<SERVICE > /etc/systemd/system/gunicorn.service
+                  [Unit]
+                  Description=Gunicorn daemon for Django project
+                  After=network.target
+
+                  [Service]
+                  User=root
+                  Group=root
+                  WorkingDirectory=/app
+                  ExecStart=/app/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:8000 --forwarded-allow-ips="*" app.wsgi:application
+
+                  Restart=always
+                  RestartSec=3
+
+                  [Install]
+                  WantedBy=multi-user.target
+                  SERVICE
+                  sudo systemctl daemon-reload
+                  sudo systemctl enable gunicorn
+                  sudo systemctl restart gunicorn
+                  EOF
+            - name: Create Infrastructure 2
+              run: |
+                  ssh -o StrictHostKeyChecking=no root@167.99.129.144 <<EOF
                   if [ ! -d "/app" ]; then
                       mkdir -p /app
                   fi
