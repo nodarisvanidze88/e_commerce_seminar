@@ -17,3 +17,10 @@ jobs:
               uses: webfactory/ssh-agent@v0.5.3
               with:
                   ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+            - name: Create Infrastructure
+              run: |
+                  ssh -o StrictHostKeyChecking=no root@207.154.242.51 <<EOF
+                  if [ ! -d "/app" ]; then
+                      mkdir -p /app
+                  fi
+                  EOF
