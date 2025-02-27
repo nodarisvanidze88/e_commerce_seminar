@@ -23,4 +23,8 @@ jobs:
                   if [ ! -d "/app" ]; then
                       mkdir -p /app
                   fi
+                  cd /app
+                  sudo apt update
+                  sudo apt install -y python3-venv python3-pip gunicorn
+                  git clone https://github.com/nodarisvanidze88/e_commerce_seminar.git .
                   EOF
